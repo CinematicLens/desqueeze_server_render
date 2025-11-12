@@ -21,7 +21,8 @@ app.use(
   cors({
     origin: [
       "https://anamorphic-desqueeze.com",
-      "https://www.anamorphic-desqueeze.com",   // add this
+      "https://www.anamorphic-desqueeze.com",
+      "https://cinematiclens.github.io",
       "http://localhost:3000",
       "http://localhost:5173",
       "http://127.0.0.1:3000"

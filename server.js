@@ -94,19 +94,31 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     // Duration (may be 0 if unknown)
     const dur = await probeDuration(inFile);
 
-    // scale width by factor, keep height; setsar=1 fixes pixel aspect ratio
-    const vf = `scale=trunc(iw*${factor}/2)*2:ih,setsar=1`;
+  const vf = `scale=trunc(iw*${factor}/2)*2:ih,setsar=1`;
 
-    const args = [
-      "-y", "-i", inFile,
-      ...(fps ? ["-r", String(fps)] : []),
-      "-c:v", "libx264", "-b:v", String(bitrate),
-      "-pix_fmt", "yuv420p",
-      "-vf", vf,
-      "-c:a", "copy",
-      "-movflags", "faststart",
-      outPath
-    ];
+	const args = [
+	  "-y", "-i", inFile,
+	  ...(fps ? ["-r", String(fps)] : []),
+
+	  // Map streams safely (works even if there's no audio)
+	  "-map", "0:v:0", "-map", "0:a:0?",
+
+	  // Video: H.264, web-safe pixel format
+	  "-c:v", "libx264",
+	  "-b:v", String(bitrate),
+	  "-pix_fmt", "yuv420p",
+	  "-vf", vf,
+
+	  // Audio: re-encode to AAC (more reliable than copy)
+	  "-c:a", "aac",
+	  "-b:a", "192k",
+
+	  // Web playback + avoid hangs on mismatched durations
+	  "-movflags", "faststart",
+	  "-shortest",
+
+	  outPath
+	];
 
     const ff = spawn(ffmpegPath, args);
 

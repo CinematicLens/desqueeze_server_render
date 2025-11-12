@@ -35,6 +35,7 @@ app.use(
 app.use(morgan("dev"));
 
 // Static downloads directory (public links)
+// Static downloads directory (public links)
 const downloadsDir = path.join(__dirname, "downloads");
 app.use("/downloads", express.static(downloadsDir));
 
@@ -46,6 +47,7 @@ app.get("/download/:name", (req, res, next) => {
     if (err) next(err);
   });
 });
+
 
 // Health / root
 app.get("/", (_req, res) => res.send("✅ Desqueeze backend running"));
